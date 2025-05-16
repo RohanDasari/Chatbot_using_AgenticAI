@@ -786,30 +786,30 @@ class chatbot:
         workflow = StateGraph(GraphState)
 
         # Define the nodes
-        workflow.add_node("retrieve", self.retriever_func)  # retrieve
-        workflow.add_node("My_Ai_Assistant",self.ai_assistant)
-        workflow.add_node("grade_documents", self.grade_documents)  # grade documents
+        workflow.add_node("doc_retriever", self.retriever_func)  # retrieve
+        workflow.add_node("Ai_Assistant",self.ai_assistant)
+        workflow.add_node("documents_checker", self.grade_documents)  # grade documents
         workflow.add_node("generate", self.generate)  # generatae
-        workflow.add_node("transform_query", self.transform_query)  # transform_query
-        workflow.add_node("web_search_node", self.web_search)  # web search
+        workflow.add_node("query_enhancer", self.transform_query)  # transform_query
+        workflow.add_node("web_scroller", self.web_search)  # web search
 
         # Build graph
-        workflow.add_edge(START,"My_Ai_Assistant")
-        workflow.add_conditional_edges("My_Ai_Assistant",
+        workflow.add_edge(START,"Ai_Assistant")
+        workflow.add_conditional_edges("Ai_Assistant",
                             self.custom_tools_condition,
-                            {"tools": "retrieve",
+                            {"tools": "doc_retriever",
                                 END: END})
-        workflow.add_edge("retrieve", "grade_documents")
+        workflow.add_edge("doc_retriever", "documents_checker")
         workflow.add_conditional_edges(
-            "grade_documents",
+            "documents_checker",
             self.decide_to_generate,
             {
-                "transform_query": "transform_query",
+                "transform_query": "query_enhancer",
                 "generate": "generate",
             },
         )
-        workflow.add_edge("transform_query", "web_search_node")
-        workflow.add_edge("web_search_node", "generate")
+        workflow.add_edge("query_enhancer", "web_scroller")
+        workflow.add_edge("web_scroller", "generate")
         workflow.add_edge("generate", END)
         
 
